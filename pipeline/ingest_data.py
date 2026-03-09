@@ -46,7 +46,7 @@ def run(
 
     prefix = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow'
     url = f'{prefix}/yellow_tripdata_{year}-{month:02d}.csv.gz'
-    engine = create_engine(f'postgresql+psycopg://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}')
+    engine = create_engine(f'postgresql+psycopg2://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}')
 
 
 
@@ -73,9 +73,6 @@ def run(
             if_exists='append'
         )
 
-
-
-
 @click.command()
 @click.option('--pg_user', default='root', help='Postgres user')
 @click.option('--pg_pass', default='root', help='Postgres password')
@@ -86,6 +83,7 @@ def run(
 @click.option('--month', default=1, type=int, help='Month for taxi data')
 @click.option('--chunk_size', 'chunk_size', default=100000, type=int, help='CSV chunk size')
 @click.option('--target_table', default='yellow_taxi_data', help='Destination table name')
+
 def main(
     pg_user,
     pg_pass,
