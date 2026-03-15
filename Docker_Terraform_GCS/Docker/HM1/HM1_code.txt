@@ -1,0 +1,58 @@
+Q1: 25.3
+docker version
+
+docker run -it --entrypoint=bash python:3.13
+
+root@24f3dfb05936:/# pip --version
+pip 25.3 from /usr/local/lib/python3.13/site-packages/pip (python 3.13)
+
+Q2: postgres:5432 (and db:5432)
+    host_name: postgres
+    username: 'postgres'
+    password: 'postgres'
+    ports:5432
+
+Q3: 8009
+select count(1) from public.green_taxi_data 
+where DATE(lpep_pickup_datetime)>= '2025-11-01' and DATE(lpep_pickup_datetime)<='2025-12-01'
+and trip_distance<=1
+;
+
+Q4: 2025-11-14
+select DATE(lpep_pickup_datetime), max(trip_distance) 
+from public.green_taxi_data 
+where trip_distance<100
+group by DATE(lpep_pickup_datetime)
+order by 2 desc
+;
+
+Q5:East Harlem North
+select "PULocationID","Zone", sum(total_amount) 
+from public.green_taxi_data t
+left join public.taxi_zone_data z on t."PULocationID" = z."LocationID"
+where DATE(lpep_pickup_datetime) = '2025-11-18'
+group by "PULocationID","Zone"
+order by 3 desc
+;
+
+Q6: Upper East Side North
+select a.*,
+z2."LocationID",
+z2."Zone" as drop_zone
+from 
+(select 
+"PULocationID" as pickup_id,
+"Zone" as pickup_zone,
+"DOLocationID" as drop_id,
+sum(tip_amount) 
+from public.green_taxi_data t
+left join public.taxi_zone_data z on t."PULocationID" = z."LocationID"
+where date_part('month', lpep_pickup_datetime) = 11
+and "PULocationID" = '74'
+group by "PULocationID","Zone","DOLocationID"
+order by 4 desc) a
+left join public.taxi_zone_data z2 on a.drop_id = z2."LocationID"
+order by "sum" desc
+;
+
+Q7:terraform init, terraform apply -auto-approve, terraform destroy
